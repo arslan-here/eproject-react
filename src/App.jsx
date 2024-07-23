@@ -11,6 +11,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Event from './pages/Event';
 import Users from './pages/Users';
+import Schedule from './pages/Schedule';
+import Exhibitor from './pages/Exhibitor';
 
 const API_URL = import.meta.env.VITE_API_URL
 function App() {
@@ -34,6 +36,12 @@ function App() {
         } />
         <Route path="users" element={ 
          <AuthLayout><Users /></AuthLayout>
+        } />
+        <Route path="schedule" element={ 
+         <AuthLayout><Schedule /></AuthLayout> 
+        } />
+        <Route path="exhibitor" element={ 
+         <AuthLayout><Exhibitor /></AuthLayout> 
         } />
         </>
     )
