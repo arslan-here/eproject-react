@@ -97,7 +97,24 @@ function Drawer() {
             </a>
           </li>
 
-
+          <li>
+            <a
+              href="#"
+              onClick={() => navigator('/support')}
+              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+              <svg
+                className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M19 3h-1V2a1 1 0 0 0-2 0v1H8V2a1 1 0 0 0-2 0v1H5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM4 5h16v14H4V5zm4 4h8v2H8V9zm0 4h8v2H8v-2z" />
+              </svg>
+              <span className="flex-1 ms-3 text-left whitespace-nowrap">Support</span>
+            </a>
+          </li>
 
 
         </ul>

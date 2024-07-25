@@ -13,6 +13,9 @@ import Event from './pages/Event';
 import Users from './pages/Users';
 import Schedule from './pages/Schedule';
 import Exhibitor from './pages/Exhibitor';
+import Profile from './pages/Profile';
+import Support from './pages/Support';
+
 
 const API_URL = import.meta.env.VITE_API_URL
 function App() {
@@ -42,6 +45,12 @@ function App() {
         } />
         <Route path="exhibitor" element={ 
          <AuthLayout><Exhibitor /></AuthLayout> 
+        } />
+        <Route path="profile" element={ 
+         <AuthLayout><Profile /></AuthLayout> 
+        } />
+        <Route path="support" element={ 
+         <AuthLayout><Support /></AuthLayout> 
         } />
         </>
     )

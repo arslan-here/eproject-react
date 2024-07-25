@@ -1,10 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState ,useContext } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MdClose } from "react-icons/md";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { RxHamburgerMenu } from "react-icons/rx";
 import Drawer from './../components/Drawer';
+import Profile from './../pages/Profile'
+ 
 
 const API_URL = import.meta.env.VITE_API_URL
 function AuthLayout({children}) {
@@ -91,7 +93,7 @@ function AuthLayout({children}) {
     <div class="py-1 text-left" role="none">
 
         <a href="#" onClick={()=>{logout()}} class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-2">Logout</a>
-      
+        <Link to='/profile' class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-2">Profile</Link>       
     </div>
   </div>
 }
