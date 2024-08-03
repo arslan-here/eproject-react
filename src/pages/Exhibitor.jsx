@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
 
 function Exhibitor() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     contact: '',
     status: '',
   });
+  const [exhibitors, setExhibitors] = useState([
+    { id: 1, name: 'John Doe', email: 'john.doe@example.com', contact: '123-456-7890', status: 'Confirmed' },
+    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', contact: '987-654-3210', status: 'Pending' },
+    // Add more exhibitors as needed
+  ]);
+  const [deleteExhibitorId, setDeleteExhibitorId] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -21,6 +29,11 @@ function Exhibitor() {
     e.preventDefault();
     console.log('Form data submitted:', formData);
     setIsModalOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    setExhibitors(exhibitors.filter(exhibitor => exhibitor.id !== id));
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -41,25 +54,32 @@ function Exhibitor() {
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-            {/* Example data */}
-            <tr>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">John Doe</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">john.doe@example.com</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">123-456-7890</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Confirmed</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Jane Smith</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">jane.smith@example.com</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">987-654-3210</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Pending</td>
-            </tr>
+            {exhibitors.map((exhibitor) => (
+              <tr key={exhibitor.id}>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{exhibitor.name}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{exhibitor.email}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{exhibitor.contact}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{exhibitor.status}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">
+                  <div className="inline-flex items-center justify-center w-8 h-8 bg-red-500 text-white cursor-pointer hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <FaTrashAlt
+                      onClick={() => {
+                        setDeleteExhibitorId(exhibitor.id);
+                        setIsDeleteModalOpen(true);
+                      }}
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
+
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50 dark:bg-opacity-70">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl p-6 mx-4 my-10">
@@ -133,6 +153,31 @@ function Exhibitor() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50 dark:bg-opacity-70">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 mx-4 my-10">
+            <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+            <p className="mb-4">Are you sure you want to delete this exhibitor?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteExhibitorId)}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

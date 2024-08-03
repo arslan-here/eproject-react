@@ -12,13 +12,14 @@ function Register() {
    
 <Formik
 initialValues={{
-   name:'' , email : '' , password: '' 
+   name:'' , email : '' , password: '' ,    role:"Exhibiter"
 }}
 
 validationSchema={Yup.object({
     name : Yup.string().required(),
     email : Yup.string().email().required(),
     password : Yup.string().required(),
+
 })}
 
 onSubmit={ async (values)=>{

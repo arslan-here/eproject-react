@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
 
 function Schedule() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     event: '',
     speaker: '',
@@ -9,6 +11,12 @@ function Schedule() {
     location: '',
     datetime: '',
   });
+  const [schedules, setSchedules] = useState([
+    { id: 1, event: 'Event 1', speaker: 'John Doe', topic: 'Topic A', location: 'Room 101', datetime: '2024-07-23T10:00' },
+    { id: 2, event: 'Event 2', speaker: 'Jane Smith', topic: 'Topic B', location: 'Room 202', datetime: '2024-07-24T14:00' },
+    // Add more schedules as needed
+  ]);
+  const [deleteScheduleId, setDeleteScheduleId] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +30,11 @@ function Schedule() {
     e.preventDefault();
     console.log('Form data submitted:', formData);
     setIsModalOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    setSchedules(schedules.filter(schedule => schedule.id !== id));
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -43,27 +56,33 @@ function Schedule() {
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Topic</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-            {/* Example data */}
-            <tr>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Event 1</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">John Doe</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Topic A</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Room 101</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">2024-07-23 10:00 AM</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Event 2</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Jane Smith</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Topic B</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">Room 202</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">2024-07-24 02:00 PM</td>
-            </tr>
+            {schedules.map((schedule) => (
+              <tr key={schedule.id}>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{schedule.event}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{schedule.speaker}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{schedule.topic}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{schedule.location}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{schedule.datetime.replace('T', ' ')}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">
+                  <div className="inline-flex items-center justify-center w-8 h-8 bg-red-500 text-white cursor-pointer hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <FaTrashAlt
+                      onClick={() => {
+                        setDeleteScheduleId(schedule.id);
+                        setIsDeleteModalOpen(true);
+                      }}
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
+
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50 dark:bg-opacity-70">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl p-6 mx-4 my-10">
@@ -149,6 +168,31 @@ function Schedule() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50 dark:bg-opacity-70">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 mx-4 my-10">
+            <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+            <p className="mb-4">Are you sure you want to delete this schedule?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteScheduleId)}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
