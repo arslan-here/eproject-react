@@ -1,6 +1,9 @@
 import axios from 'axios';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import * as Yup from 'Yup'
 
 const API_URL = import.meta.env.VITE_API_URL
 function Users() {
@@ -63,20 +66,22 @@ function Users() {
   }
 
 
-  const deleteUser = () =>{
+  const deleteUser = async (id) =>{
     const token = localStorage.getItem('token');       
     if (token) {
-        axios.delete(`${API_URL}user`, {
+      await  axios.delete(`${API_URL}user/delete/`+id, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         })
-        .then(response => {
-            console.log(response);
-             setData(response.data.users) 
+        .then(response => {console.log(response)
+            toast.success(response.data.message)
+            setDeleteUserId(null)
+            setIsDeleteModalOpen(false)
+            fetchUser();
         })
         .catch(error => {
-            alert("Fetching Error")
+          toast.error(error.response.data.message)
         });
     } else {
         navigate('/login')
@@ -117,13 +122,13 @@ function Users() {
                 <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{user.contact || "N/A"}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">{user.role}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center">
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-red-500 text-white cursor-pointer hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
-                    <FaTrashAlt
-                      onClick={() => {
-                        setDeleteUserId(user.id);
+                  <div
+                    onClick={() => {
+                        setDeleteUserId(user._id);
                         setIsDeleteModalOpen(true);
                       }}
-                    />
+                  className="inline-flex items-center justify-center w-8 h-8 bg-red-500 text-white cursor-pointer hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <FaTrashAlt/>
                   </div>
                 </td>
               </tr>
@@ -136,72 +141,98 @@ function Users() {
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50 dark:bg-opacity-70">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl p-6 mx-4 my-10">
             <h2 className="text-xl font-semibold mb-4">Create New User</h2>
-            <form onSubmit={handleSubmit}>
+            <Formik 
+            validationSchema={Yup.object({
+              name : Yup.string().required(),
+              email : Yup.string().email().required(),
+              password : Yup.string().required(),
+          
+          })}
+            initialValues={{name:'',email:'',contact:'',password:'',role:''}}
+            onSubmit={async(values)=>{
+              const token = localStorage.getItem('token'); 
+              await axios.post(`${API_URL}user/create`,values,{
+                headers: {
+                  Authorization: `Bearer ${token}`
+              }
+              })
+              .then((response)=>{
+                  fetchUser();
+                  toast.success("Registered successfully")
+                 
+                  setIsModalOpen(false)
+              
+              })
+              .catch((error)=>{
+                toast.error(error.response.data.message)
+              })
+            }}
+            >
+            <Form >
               <div className="flex gap-4 mb-4">
                 <div className="w-1/2">
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">Name</label>
-                  <input
+                  <Field
                     type="text"
                     id="name"
                     name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
+
                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600"
                     required
                   />
+                  <ErrorMessage name='name' className='text-red-500' />
                 </div>
                 <div className="w-1/2">
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">Email</label>
-                  <input
+                  <Field
                     type="email"
                     id="email"
                     name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
+
                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600"
                     required
                   />
+                  <ErrorMessage name='email' className='text-red-500' />
                 </div>
               </div>
               <div className="mb-4">
                 <label htmlFor="contact" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">Contact</label>
-                <input
+                <Field
                   type="text"
                   id="contact"
                   name="contact"
-                  value={formData.contact}
-                  onChange={handleInputChange}
+
                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600"
                   required
                 />
+                    <ErrorMessage name='contact' className='text-red-500' />
               </div>
               <div className="mb-4">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">Password</label>
-                <input
+                <Field
                   type="password"
                   id="password"
                   name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
+
                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600"
                   required
                 />
+                 <ErrorMessage name='password' className='text-red-500' />
               </div>
               <div className="mb-4">
                 <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">Role</label>
-                <select
+                <Field as="select"
                   id="role"
                   name="role"
-                  value={formData.role}
-                  onChange={handleInputChange}
                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600"
                   required
                 >
                   <option value="">Select role</option>
                   <option value="admin">Admin</option>
-                  <option value="exhibitor">Exhibitor</option>
-                  <option value="attendee">Attendee</option>
-                </select>
+                  <option value="Exhibitor">Exhibitor</option>
+                  <option value="Attendee">Attendee</option>
+                </Field>
+                <ErrorMessage name='role' className='text-red-500' />
               </div>
               <div className="flex justify-end space-x-4">
                 <button
@@ -218,7 +249,8 @@ function Users() {
                   Create
                 </button>
               </div>
-            </form>
+            </Form>
+            </Formik>
           </div>
         </div>
       )}
@@ -238,7 +270,7 @@ function Users() {
               </button>
               <button
                 type="button"
-                onClick={() => handleDelete(deleteUserId)}
+                onClick={() => deleteUser(deleteUserId)}
                 className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-600 dark:bg-red-600 dark:hover:bg-red-700"
               >
                 Delete
