@@ -1,5 +1,11 @@
+import axios from 'axios';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+import * as Yup from 'Yup'
 
+
+const API_URL = import.meta.env.VITE_API_URL
 function Support() {
   const [formData, setFormData] = useState({
     name: '',
@@ -28,62 +34,88 @@ function Support() {
       <p className="mb-4 text-gray-700 text-left">
         Please fill out the form below with your inquiry, and we will get back to you as soon as possible.
       </p>
-      <form onSubmit={handleSubmit}>
+      <Formik validationSchema={Yup.object({
+        name:Yup.string().required(),
+        email:Yup.string().email().required(),
+        subject:Yup.string().required(),
+        message:Yup.string().required(),
+      })}
+      initialValues={{
+        name:'',email:'',subject:'',message:''
+      }}
+
+      onSubmit={async(values,{ resetForm })=>{
+        const token = localStorage.getItem('token'); 
+        await axios.post(`${API_URL}support/create`,values,{
+          headers: {
+            Authorization: `Bearer ${token}`
+        }
+        })
+        .then((response)=>{
+            toast.success("Submitted successfully")
+            resetForm()
+        
+        })
+        .catch((error)=>{
+          toast.error(error.response.data.message)
+        })
+      }}
+      >
+      <Form >
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2 text-left" htmlFor="name">
             Name
           </label>
-          <input
+          <Field
             type="text"
             name="name"
             id="name"
-            value={formData.name}
-            onChange={handleChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter your name"
           />
+          <ErrorMessage name="name" className='text-red-500' />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2 text-left" htmlFor="email">
             Email
           </label>
-          <input
+          <Field
             type="email"
             name="email"
             id="email"
-            value={formData.email}
-            onChange={handleChange}
+
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter your email"
           />
+          <ErrorMessage name="email" className='text-red-500' />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2 text-left" htmlFor="subject">
             Subject
           </label>
-          <input
+          <Field
             type="text"
             name="subject"
             id="subject"
-            value={formData.subject}
-            onChange={handleChange}
+
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter the subject"
           />
+          <ErrorMessage name="subject" className='text-red-500' />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2 text-left" htmlFor="message">
             Message
           </label>
-          <textarea
+          <Field as="textarea"
             name="message"
             id="message"
-            value={formData.message}
-            onChange={handleChange}
+
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter your message"
             rows="5"
-          ></textarea>
+          ></Field>
+          <ErrorMessage name="message" className='text-red-500' />
         </div>
         <div className="flex items-center justify-between">
           <button
@@ -93,7 +125,8 @@ function Support() {
             Submit
           </button>
         </div>
-      </form>
+      </Form>
+      </Formik>
     </div>
   );
 }
