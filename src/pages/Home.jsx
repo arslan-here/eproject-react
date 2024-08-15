@@ -1,4 +1,5 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const pieData = [
@@ -20,15 +21,45 @@ const lineData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+const API_URL = import.meta.env.VITE_API_URL
 function Home() {
+
+
+  const [data , setData] = useState([]);
+
+
+    const fetch = () =>{
+        const token = localStorage.getItem('token');       
+        if (token) {
+            axios.get(`${API_URL}dashboard`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                console.log(response);
+                 setData(response.data) 
+            })
+            .catch(error => {
+                alert("Fetching Error")
+            });
+        } else {
+            navigate('/login')
+        }
+    }
+
+    useEffect(()=>{
+        fetch();
+    },[])
+
   return (
     <div className="p-4">
       <div className="flex space-x-4 mb-4">
         <div className="bg-white rounded-lg shadow-md p-6 flex-1 flex justify-between items-center">
           <div className="text-left">
             <h3 className="text-xl font-semibold">Total Users</h3>
-            <p className="text-2xl font-bold">1234</p>
-            <p className="text-gray-500">This is a description</p>
+            <p className="text-2xl font-bold">{data.totalusers}</p>
+        
           </div>
           <div className="flex items-center justify-center bg-green-100 rounded-full w-16 h-16">
             <svg
@@ -44,8 +75,8 @@ function Home() {
         <div className="bg-white rounded-lg shadow-md p-6 flex-1 flex justify-between items-center">
           <div className="text-left">
             <h3 className="text-xl font-semibold">Total Exhibitors</h3>
-            <p className="text-2xl font-bold">567</p>
-            <p className="text-gray-500">This is a description</p>
+            <p className="text-2xl font-bold">{data.totalexhibitors}</p>
+      
           </div>
           <div className="flex items-center justify-center bg-blue-100 rounded-full w-16 h-16">
             <svg
@@ -60,9 +91,9 @@ function Home() {
         </div>
         <div className="bg-white rounded-lg shadow-md p-6 flex-1 flex justify-between items-center">
           <div className="text-left">
-            <h3 className="text-xl font-semibold">Other Metric</h3>
-            <p className="text-2xl font-bold">89</p>
-            <p className="text-gray-500">This is a description</p>
+            <h3 className="text-xl font-semibold">Total Expo</h3>
+            <p className="text-2xl font-bold">{data.totalexpos}</p>
+        
           </div>
           <div className="flex items-center justify-center bg-yellow-100 rounded-full w-16 h-16">
             <svg
